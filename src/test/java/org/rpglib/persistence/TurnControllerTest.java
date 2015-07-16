@@ -11,7 +11,7 @@ public class TurnControllerTest extends BaseTest {
         AdventureArea areaParam = getAdventureArea(true);
 
         TurnController controller = new TurnController();
-        GameState newGameState = controller.takeTurn(getGameState(), areaParam);
+        GameState newGameState = controller.takeTurn(getGameState().getId(), areaParam.getId());
 
         for (String msg : newGameState.getMessages()) {
             System.out.println(msg);

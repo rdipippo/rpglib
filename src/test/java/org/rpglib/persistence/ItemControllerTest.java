@@ -1,16 +1,12 @@
 package org.rpglib.persistence;
 
+import com.google.common.collect.Lists;
 import junit.framework.Assert;
 import org.bson.types.ObjectId;
-import org.deadsimple.mundungus.annotations.Collection;
 import org.junit.Before;
 import org.junit.Test;
-import org.reflections.ReflectionUtils;
+import org.rpglib.MyGameState;
 import org.rpglib.controller.ItemController;
-import com.google.common.collect.Lists;
-
-import java.lang.reflect.Method;
-import java.util.Set;
 
 public class ItemControllerTest extends BaseTest {
     
@@ -61,13 +57,17 @@ public class ItemControllerTest extends BaseTest {
     @Test
     public void testEquipUneqip() throws Exception {
         GameState gs = this.controller.equipOrUnequipItems(getGameState().getId(), Lists.newArrayList(girdle.getId(), sword.getId()), false);
-        final GameState equippedPlayer = em().get(getGameState()).nextEntity();
+
+        girdle = em().find(Item.class, girdle.getId());
+        sword = em().find(Item.class, sword.getId());
 
         Assert.assertTrue(girdle.isEquipped());
         Assert.assertTrue(sword.isEquipped());
 
         gs = this.controller.equipOrUnequipItems(getGameState().getId(), Lists.newArrayList(sword.getId(), girdle.getId()), true);
-        final GameState unEquippedPlayer = em().get(getGameState()).nextEntity();
+
+        girdle = em().find(Item.class, girdle.getId());
+        sword = em().find(Item.class, sword.getId());
 
         Assert.assertFalse(girdle.isEquipped());
         Assert.assertFalse(sword.isEquipped());
@@ -116,22 +116,10 @@ public class ItemControllerTest extends BaseTest {
         Assert.assertEquals(1, gameState.getCurrentAttack().getMinDamage());
     }
 
-    @Collection
-    public class MyGameState extends GameState {
-        protected int chutzpah;
-
-        public int getChutzpah() {
-            return chutzpah;
-        }
-
-        public void setChutzpah(int chutzpah) {
-            this.chutzpah = chutzpah;
-        }
-    }
-
     @Test
     public void testCustomGameStateField() throws Exception {
         final MyGameState gameState = new MyGameState();
+        em().persist(gameState);
         this.controller.equipOrUnequipItems(gameState.getId(), Lists.newArrayList(intelligentSword.getId()), true);
     }
 }

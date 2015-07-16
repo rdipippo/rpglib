@@ -1,5 +1,6 @@
 package org.rpglib.controller;
 
+import org.bson.types.ObjectId;
 import org.deadsimple.mundungus.EntityManager;
 import org.rpglib.calc.Random;
 import org.rpglib.combat.Combatant;
@@ -10,8 +11,9 @@ import org.rpglib.persistence.Opponent;
 
 
 public class CombatController {
-    public GameState combatRound(final GameState gs) {
+    public GameState combatRound(final ObjectId gsId) {
         EntityManager em = RPGLib.entityManager();
+        GameState gs = em.find(GameState.class, gsId);
 
         boolean playerWonInitiative = false;
         Combatant combatantWithInitiative = null, combatantWithoutInitiative = null;
@@ -45,7 +47,7 @@ public class CombatController {
         }
 
         if (combatComplete) {
-            combatInProgress.setComplete(true);
+            gs.getEncounter().getCombat().setComplete(true);
 
             if (gs.getHealth() <= 0) {
                 gs.addMessage(GameMessage.PLAYER_LOST_COMBAT.format());

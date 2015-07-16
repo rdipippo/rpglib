@@ -41,6 +41,8 @@ public class GameState implements Combatant {
 
     private int money;
 
+    private int remainingTurns;
+
     private Encounter encounter;
 
 	private Boolean isDeleted;
@@ -127,6 +129,14 @@ public class GameState implements Combatant {
 
     public void setCurrentAttack(Attack attack) {
         this.currentAttack = attack;
+    }
+
+    public int getRemainingTurns() {
+        return remainingTurns;
+    }
+
+    public void setRemainingTurns(int remainingTurns) {
+        this.remainingTurns = remainingTurns;
     }
 
     public void takeDamage(int damage) {

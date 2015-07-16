@@ -10,7 +10,7 @@ public class SkillControllerTest extends BaseTest {
     public void testCombatSkill() throws Exception {
         AdventureArea area = getAdventureArea(true);
         TurnController tc = new TurnController();
-        GameState currentGS = tc.takeTurn(getGameState(), area);
+        GameState currentGS = tc.takeTurn(getGameState().getId(), area.getId());
 
         CombatSkill cs = new CombatSkill();
         cs.setMinDamage(2);
@@ -48,16 +48,16 @@ public class SkillControllerTest extends BaseTest {
         TurnController tc = new TurnController();
         AdventureArea area = getAdventureArea(false);
 
-        GameState gs = tc.takeTurn(gameState, area);
+        GameState gs = tc.takeTurn(gameState.getId(), area.getId());
         Assert.assertEquals(2, gs.getEffects().get(0).getNumRounds());
         Assert.assertEquals(100, gameState.getAttack());
 
-        gs = tc.takeTurn(gameState, area);
+        gs = tc.takeTurn(gameState.getId(), area.getId());
         Assert.assertEquals(1, gs.getEffects().get(0).getNumRounds());
         Assert.assertEquals(100, gameState.getAttack());
 
-        gs = tc.takeTurn(gameState, area);
+        gs = tc.takeTurn(gameState.getId(), area.getId());
         Assert.assertEquals(0, gs.getEffects().size());
-        Assert.assertEquals(50, gameState.getAttack());
+        Assert.assertEquals(50, gs.getAttack());
     }
 }

@@ -18,6 +18,8 @@ public class AdventureArea {
 
     List<AdventureArea> subAreas;
 
+    int turnCount;
+
     public ObjectId getId() {
         return id;
     }
@@ -45,5 +47,13 @@ public class AdventureArea {
 
     public void setSubAreas(List<AdventureArea> subAreas) {
         this.subAreas = subAreas;
+    }
+
+    public int getTurnCount() {
+        return turnCount;
+    }
+
+    public void setTurnCount(int turnCount) {
+        this.turnCount = turnCount;
     }
 }

@@ -32,16 +32,18 @@ public class CombatControllerTest extends BaseTest {
     @Test
     public void testCombat() {
         CombatController controller = new CombatController();
+        GameState gs = null;
 
         do {
-            GameState gs = controller.combatRound(getGameState());
+            gs = controller.combatRound(getGameState().getId());
 
             for (String msg : gs.getMessages()) {
                 System.out.println(msg);
             }
 
-            System.out.println("Player: " + getGameState().getHealth() + " remaining health.");
+            opponent = em().find(Opponent.class, opponent.getId());
+            System.out.println("Player: " + gs.getHealth() + " remaining health.");
             System.out.println("Opponent: " + opponent.getHealth() + " remaining health.");
-        } while(getGameState().getEncounter().getCombat().isComplete() == false);
+        } while(gs.getEncounter().getCombat().isComplete() == false);
     }
 }

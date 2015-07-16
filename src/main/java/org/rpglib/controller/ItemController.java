@@ -18,11 +18,13 @@ public class ItemController {
 	   final EntityManager em = RPGLib.entityManager();
 	   GameState gs = em.find(GameState.class, gsId);
 
+	   // TODO these errors are never USED!
 	   final List<String> errors = new ArrayList<String>();
-	   
+
 	   for (ObjectId itemId : itemIds) {
 		   Item item = em.find(Item.class, itemId);
 
+		   // TODO items should have prerequisites that must be checked (i.e must be a certain class or level.
 		   if (unequip && ! item.isEquipped()) {
 		       errors.add(GameMessage.ITEM_NOT_EQUIPPED.format(item.getName()));
 		   } else if (! unequip && item.isEquipped()) {

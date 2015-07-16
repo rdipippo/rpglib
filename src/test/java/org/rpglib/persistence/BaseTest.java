@@ -42,6 +42,7 @@ public class BaseTest {
         gs.setHealth(10);
         gs.setCurrentAttack(attack);
         gs.setLevel(1);
+        gs.setRemainingTurns(40);
 
         final ObjectId playerId = em().persist(gs);
         gs.setId(playerId);
@@ -90,6 +91,7 @@ public class BaseTest {
             em().persist(encounter);
 
             area.setEncounters(Lists.newArrayList(encounter));
+            area.setTurnCount(1);
         }
 
         em().persist(area);

@@ -8,10 +8,15 @@ import java.util.Iterator;
 
 
 public class TurnController {
-   public GameState takeTurn(GameState gs, AdventureArea area) throws NoSuchFieldException {
-       EntityCursor<AdventureArea> cursor = RPGLib.entityManager().get(area);
-       AdventureArea storedArea = cursor.nextEntity();
-       GameState newGameState = gs;
+   public GameState takeTurn(ObjectId gsId, ObjectId areaId) throws NoSuchFieldException {
+       AdventureArea area = RPGLib.entityManager().find(AdventureArea.class, areaId);
+       GameState gs = RPGLib.entityManager().find(GameState.class, gsId);
+
+       if (gs.getRemainingTurns() - area.getTurnCount() <= 0) {
+           // TODO set error message.
+       }
+
+       gs.setRemainingTurns(gs.getRemainingTurns() - area.getTurnCount());
 
        // check for effects that have expired.
        if (gs.getEffects() != null && gs.getEffects().size() > 0) {
@@ -26,8 +31,8 @@ public class TurnController {
            }
        }
 
-       if (storedArea.getEncounters() != null && storedArea.getEncounters().size() > 0) {
-           Encounter encounter = storedArea.chooseEncounter(gs);
+       if (area.getEncounters() != null && area.getEncounters().size() > 0) {
+           Encounter encounter = area.chooseEncounter(gs);
            ObjectId opponentTemplate = encounter.getOpponentTemplate();
 
            if (opponentTemplate != null) {
@@ -38,18 +43,20 @@ public class TurnController {
                encounter.setCombat(combat);
                gs.setEncounter(encounter);
 
+               RPGLib.entityManager().persist(gs);
+
                CombatController combatController = new CombatController();
-               newGameState = combatController.combatRound(gs);
+               gs = combatController.combatRound(gs.getId());
            }
 
-           if (newGameState.getEncounter().getCombat().isPlayerWon()) {
-               encounter.collectRewards(newGameState);
+           if (gs.getEncounter().getCombat().isPlayerWon()) {
+               encounter.collectRewards(gs);
            }
        }
 
        RPGLib.entityManager().persist(gs);
 
-       return newGameState;
+       return gs;
    }
 
     public GameState continueTurn(GameState gs) {
@@ -59,7 +66,7 @@ public class TurnController {
             Combat combat = gs.getEncounter().getCombat();
 
             CombatController combatController = new CombatController();
-            newGameState = combatController.combatRound(gs);
+            newGameState = combatController.combatRound(gs.getId());
 
             if (newGameState.getEncounter().getCombat().isPlayerWon()) {
                 newGameState.getEncounter().collectRewards(newGameState);
