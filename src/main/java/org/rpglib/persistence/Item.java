@@ -35,6 +35,7 @@ public class Item {
 
 	public Item(Item templateItem, GameState gs) {
 		this.description = templateItem.getDescription();
+		this.templateId = templateItem.getId();
 		this.name = templateItem.getName();
 		this.player = gs;
 		this.equipAttributes = templateItem.getEquipAttributes();

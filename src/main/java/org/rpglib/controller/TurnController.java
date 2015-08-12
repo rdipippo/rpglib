@@ -33,25 +33,9 @@ public class TurnController {
 
        if (area.getEncounters() != null && area.getEncounters().size() > 0) {
            Encounter encounter = area.chooseEncounter(gs);
-           ObjectId opponentTemplate = encounter.getOpponentTemplate();
+           gs.setEncounter(encounter);
 
-           if (opponentTemplate != null) {
-               Opponent opponent = new Opponent(opponentTemplate);
-               RPGLib.entityManager().persist(opponent);
-
-               Combat combat = new Combat(gs, opponent);
-               encounter.setCombat(combat);
-               gs.setEncounter(encounter);
-
-               RPGLib.entityManager().persist(gs);
-
-               CombatController combatController = new CombatController();
-               gs = combatController.combatRound(gs.getId());
-           }
-
-           if (gs.getEncounter().getCombat().isPlayerWon()) {
-               encounter.collectRewards(gs);
-           }
+           encounter.runEncounter(gs);
        }
 
        RPGLib.entityManager().persist(gs);
@@ -60,19 +44,12 @@ public class TurnController {
    }
 
     public GameState continueTurn(GameState gs) {
-        GameState newGameState = null;
-
-        if (! gs.getEncounter().getCombat().isComplete()) {
-            Combat combat = gs.getEncounter().getCombat();
-
-            CombatController combatController = new CombatController();
-            newGameState = combatController.combatRound(gs.getId());
-
-            if (newGameState.getEncounter().getCombat().isPlayerWon()) {
-                newGameState.getEncounter().collectRewards(newGameState);
-            }
+        if (! gs.getEncounter().isComplete(gs)) {
+            gs = gs.getEncounter().continueEncounter(gs);
+        } else {
+            gs.setEncounter(null);
         }
 
-        return newGameState;
+        return gs;
     }
 }

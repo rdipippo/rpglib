@@ -43,6 +43,7 @@ public class BaseTest {
         gs.setCurrentAttack(attack);
         gs.setLevel(1);
         gs.setRemainingTurns(40);
+        gs.setMoney(100);
 
         final ObjectId playerId = em().persist(gs);
         gs.setId(playerId);
@@ -64,6 +65,27 @@ public class BaseTest {
 
     public ObjectId getItemTemplate() { return itemTemplateId; }
 
+    protected AdventureArea getAdventureAreaWithStatGainEncounter() {
+        AdventureArea area = new AdventureArea();
+        StatGainEncounter encounter = new StatGainEncounter();
+        encounter.setPercentChance(100);
+        StatReward attackReward = new StatReward(1, 6, "attack");
+        ItemReward widgetReward = new ItemReward(1, 1, getItemTemplate());
+        StatReward xpReward = new StatReward(101, 101, "experiencePoints");
+        encounter.setRewards(Lists.newArrayList((Reward) attackReward, (Reward) widgetReward, (Reward) xpReward));
+
+        em().persist(encounter);
+
+        area.setEncounters(Lists.newArrayList((Encounter) encounter));
+        area.setTurnCount(1);
+
+        em().persist(area);
+
+        AdventureArea areaParam = new AdventureArea();
+        areaParam.setId(area.getId());
+        return areaParam;
+    }
+
     protected AdventureArea getAdventureArea(boolean includeOpponent) {
         AdventureArea area = new AdventureArea();
 
@@ -79,7 +101,7 @@ public class BaseTest {
 
             em().persist(opponent);
 
-            Encounter encounter = new Encounter();
+            CombatEncounter encounter = new CombatEncounter();
             encounter.setPercentChance(100);
             encounter.setOpponentTemplate(opponent.getId());
 
@@ -90,7 +112,7 @@ public class BaseTest {
 
             em().persist(encounter);
 
-            area.setEncounters(Lists.newArrayList(encounter));
+            area.setEncounters(Lists.newArrayList((Encounter)encounter));
             area.setTurnCount(1);
         }
 

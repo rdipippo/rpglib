@@ -1,32 +1,27 @@
 package org.rpglib.controller;
 
-import com.google.common.base.Predicates;
 import org.apache.commons.beanutils.BeanUtils;
 import org.deadsimple.mundungus.EntityManager;
-import org.reflections.ReflectionUtils;
+import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import org.rpglib.intelligence.annotations.ItemListener;
 import org.rpglib.intelligence.annotations.OnEquip;
 import org.rpglib.intelligence.annotations.OnUnEquip;
 import org.rpglib.persistence.Item;
 import org.rpglib.persistence.GameState;
-import org.rpglib.persistence.PlayerAttribute;
 
-import java.beans.Introspector;
-import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Set;
 
 public class RPGLib {
-    static RPGLibReflections reflections = null;
+    static Reflections reflections = null;
 
     static EntityManager em;
 
     public static void init() {
-        reflections = new RPGLibReflections("org.rpglib", new MethodAnnotationsScanner(), new TypeAnnotationsScanner());
+        reflections = new Reflections("org.rpglib", new MethodAnnotationsScanner(), new TypeAnnotationsScanner());
         em = new EntityManager();
     }
 
@@ -43,12 +38,35 @@ public class RPGLib {
     }
 
     static boolean itemHasEquipIntelligence(final String itemName) {
-        final Set<Method> itemListenerMethodsAnnotatedWith = reflections.getAnnotatedMethodsOnAnnotatedClass(ItemListener.class, OnEquip.class, itemName);
-        return (itemListenerMethodsAnnotatedWith != null && itemListenerMethodsAnnotatedWith.size() > 0);
+        final Set<Method> methodsAnnotatedWith = reflections.getMethodsAnnotatedWith(new OnEquip() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return OnEquip.class;
+            }
+
+            @Override
+            public String itemName() {
+                return itemName;
+            }
+        });
+
+        return (methodsAnnotatedWith != null && methodsAnnotatedWith.size() > 0);
     }
 
     static void equip(final GameState gameState, final Item item) {
-        final Set<Method> methodsAnnotatedWith = reflections.getAnnotatedMethodsOnAnnotatedClass(ItemListener.class, OnEquip.class, item.getName());
+        final Set<Method> methodsAnnotatedWith = reflections.getMethodsAnnotatedWith(new OnEquip() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return OnEquip.class;
+            }
+
+            @Override
+            public String itemName() {
+                return item.getName();
+            }
+        });
 
         if (methodsAnnotatedWith != null && methodsAnnotatedWith.size() > 0) {
             final Method equipMethod = methodsAnnotatedWith.iterator().next();
@@ -68,14 +86,25 @@ public class RPGLib {
     }
 
     public static void unequip(final GameState gs, final Item item) {
-        final Set<Method> methodsAnnotatedWith = reflections.getAnnotatedMethodsOnAnnotatedClass(ItemListener.class, OnUnEquip.class, item.getName());
+        final Set<Method> methodsAnnotatedWith = reflections.getMethodsAnnotatedWith(new OnUnEquip() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return OnUnEquip.class;
+            }
+
+            @Override
+            public String itemName() {
+                return item.getName();
+            }
+        });
 
         if (methodsAnnotatedWith != null && methodsAnnotatedWith.size() > 0) {
-            final Method equipMethod = methodsAnnotatedWith.iterator().next();
-            if (equipMethod != null) {
+            final Method unequipMethod = methodsAnnotatedWith.iterator().next();
+            if (unequipMethod != null) {
                 try {
-                    final Object newInstance = equipMethod.getDeclaringClass().newInstance();
-                    equipMethod.invoke(newInstance, gs, item);
+                    final Object newInstance = unequipMethod.getDeclaringClass().newInstance();
+                    unequipMethod.invoke(newInstance, gs, item);
                 } catch (final IllegalAccessException e) {
                     throw new RuntimeException(e);
                 } catch (final InvocationTargetException e) {

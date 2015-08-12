@@ -13,7 +13,10 @@ public enum GameMessage {
     PLAYER_LOST_COMBAT("You lost. Better luck next time!"),
     PLAYER_GOT_STAT_REWARD("You got {0} {1}."),
     PLAYER_LEVELED_UP("You leveled up to level {0}. Congratulations!"),
-    PLAYER_GOT_ITEM("You found a {0}. Enjoy");
+    PLAYER_GOT_ITEM("You found a {0}. Enjoy"),
+    PLAYER_FLED_COMBAT("You ran away. Coward!"),
+    NOT_ENOUGH_MONEY("That costs {0} and you only have {1}.")
+    ;
 
     String message;
 

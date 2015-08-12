@@ -20,7 +20,8 @@ public class CombatSkill extends Skill {
         Random rand = new Random();
         int damage = rand.nextInt(getMinDamage(), getMaxDamage());
 
-        ObjectId opponentId = gs.getEncounter().getCombat().getOpponentId();
+        CombatEncounter ce = (CombatEncounter)gs.getEncounter();
+        ObjectId opponentId = ce.getCombat().getOpponentId();
         Opponent opponent = RPGLib.entityManager().find(Opponent.class, opponentId);
         opponent.takeDamage(damage);
 

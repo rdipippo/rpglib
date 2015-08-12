@@ -17,13 +17,15 @@ public class SkillControllerTest extends BaseTest {
         cs.setMaxDamage(2);
         em().persist(cs);
 
-        Opponent opponent = em().find(Opponent.class, currentGS.getEncounter().getCombat().getOpponentId());
+        CombatEncounter ce = (CombatEncounter)currentGS.getEncounter();
+
+        Opponent opponent = em().find(Opponent.class, ce.getCombat().getOpponentId());
         int opponentHealth = opponent.getHealth();
 
         SkillController sc = new SkillController();
         sc.useSkill(cs.getId(), currentGS.getId(), null);
 
-        opponent = em().find(Opponent.class, currentGS.getEncounter().getCombat().getOpponentId());
+        opponent = em().find(Opponent.class, ce.getCombat().getOpponentId());
 
         Assert.assertEquals(opponentHealth - 2, opponent.getHealth());
     }

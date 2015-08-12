@@ -5,8 +5,9 @@ import org.deadsimple.mundungus.EntityManager;
 import org.rpglib.calc.Random;
 import org.rpglib.combat.Combatant;
 import org.rpglib.domain.GameMessage;
-import org.rpglib.persistence.GameState;
 import org.rpglib.persistence.Combat;
+import org.rpglib.persistence.CombatEncounter;
+import org.rpglib.persistence.GameState;
 import org.rpglib.persistence.Opponent;
 
 
@@ -16,14 +17,15 @@ public class CombatController {
         GameState gs = em.find(GameState.class, gsId);
 
         boolean playerWonInitiative = false;
+        CombatEncounter ce = (CombatEncounter)gs.getEncounter();
         Combatant combatantWithInitiative = null, combatantWithoutInitiative = null;
-        Combat combatInProgress = gs.getEncounter().getCombat();
+        Combat combatInProgress = ce.getCombat();
 
         gs.setMessages(null);
 
-        if (gs.getEncounter().getCombat().getCombatRound() == 0) {
+        if (ce.getCombat().getCombatRound() == 0) {
             playerWonInitiative = determineInitiative();
-            gs.getEncounter().getCombat().setPlayerHasInitiative(playerWonInitiative);
+            ce.getCombat().setPlayerHasInitiative(playerWonInitiative);
         } else {
             playerWonInitiative = combatInProgress.getPlayerHasInitiative();
         }
@@ -47,14 +49,14 @@ public class CombatController {
         }
 
         if (combatComplete) {
-            gs.getEncounter().getCombat().setComplete(true);
+            ce.getCombat().setComplete(true);
 
             if (gs.getHealth() <= 0) {
                 gs.addMessage(GameMessage.PLAYER_LOST_COMBAT.format());
-                gs.getEncounter().getCombat().setPlayerWon(false);
+                ce.getCombat().setPlayerWon(false);
             } else {
                 gs.addMessage(GameMessage.PLAYER_WON_COMBAT.format());
-                gs.getEncounter().getCombat().setPlayerWon(true);
+                ce.getCombat().setPlayerWon(true);
             }
         }
 

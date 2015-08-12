@@ -10,14 +10,13 @@ import org.rpglib.persistence.GameState;
 import java.util.List;
 
 @Collection
-public class Encounter implements Outcome {
-    ObjectId opponentTemplate;
+public abstract class Encounter implements Outcome {
 
     int percentChance;
 
     ObjectId id;
 
-    Combat combat;
+    String introductionText;
 
     @SubCollection(Reward.class)
     List<Reward> rewards;
@@ -28,14 +27,6 @@ public class Encounter implements Outcome {
 
     public void setId(ObjectId id) {
         this.id = id;
-    }
-
-    public ObjectId getOpponentTemplate() {
-        return opponentTemplate;
-    }
-
-    public void setOpponentTemplate(ObjectId opponentTemplate) {
-        this.opponentTemplate = opponentTemplate;
     }
 
     @Override
@@ -55,22 +46,16 @@ public class Encounter implements Outcome {
         this.rewards = rewards;
     }
 
-    public Combat getCombat() {
-        return combat;
+    public String getIntroductionText() {
+        return introductionText;
     }
 
-    public void setCombat(Combat combat) {
-        this.combat = combat;
+    public void setIntroductionText(String introText) {
+        this.introductionText = introText;
     }
 
     @Transient
-    public boolean isComplete(GameState newGameState) {
-        if (newGameState.getEncounter() == null) {
-            return true;
-        }
-
-        return false;
-    }
+    public abstract boolean isComplete(GameState newGameState);
 
     public void collectRewards(GameState newGameState) {
         for (Reward reward : rewards) {
@@ -81,4 +66,11 @@ public class Encounter implements Outcome {
             newGameState.levelUp();
         }
     }
+
+    public abstract GameState runEncounter(GameState gs);
+
+    public abstract GameState continueEncounter(GameState gs);
+
+    @Transient
+    public abstract List<PlayerCommand> getCommands();
 }

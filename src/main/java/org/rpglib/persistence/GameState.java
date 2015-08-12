@@ -54,6 +54,8 @@ public class GameState implements Combatant {
     private List<String> messages;
 
     private List<Effect> effects;
+
+    private PlayerCommand command;
     
 	public GameState() {
 		// Auto-generated constructor stub
@@ -181,12 +183,17 @@ public class GameState implements Combatant {
         this.health = health;
     }
 
-    public Integer getMoney() {
+    public int getMoney() {
         return money;
     }
 
     public void setMoney(Integer money) {
         this.money = money;
+    }
+
+    public GameState spendMoney(int amount) {
+        money -= amount;
+        return this;
     }
 
     public Encounter getEncounter() {
@@ -223,6 +230,14 @@ public class GameState implements Combatant {
 
     public void setEffects(List<Effect> effects) {
         this.effects = effects;
+    }
+
+    public PlayerCommand getCommand() {
+        return command;
+    }
+
+    public void setCommand(PlayerCommand command) {
+        this.command = command;
     }
 
     public boolean checkForLevelUp() {

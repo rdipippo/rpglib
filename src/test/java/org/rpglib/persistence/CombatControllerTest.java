@@ -22,7 +22,8 @@ public class CombatControllerTest extends BaseTest {
         em().persist(opponent);
 
         Combat combat = new Combat(getGameState(), opponent);
-        Encounter encounter = new Encounter();
+        CombatEncounter encounter = new CombatEncounter();
+        encounter.setPercentChance(100);
         encounter.setCombat(combat);
         getGameState().setEncounter(encounter);
 
@@ -44,6 +45,6 @@ public class CombatControllerTest extends BaseTest {
             opponent = em().find(Opponent.class, opponent.getId());
             System.out.println("Player: " + gs.getHealth() + " remaining health.");
             System.out.println("Opponent: " + opponent.getHealth() + " remaining health.");
-        } while(gs.getEncounter().getCombat().isComplete() == false);
+        } while(gs.getEncounter().isComplete(gs) == false);
     }
 }
